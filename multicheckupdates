@@ -1,0 +1,6 @@
+#!/usr/bin/bash
+
+checkupdates
+yay -Qua
+flatpak remote-ls --updates --columns=application,branch
+LEGENDARY_CONFIG_PATH=~/.config/heroic/legendaryConfig/legendary/ /opt/Heroic/resources/app.asar.unpacked/build/bin/x64/linux/legendary list-installed --check-updates 2>/dev/null | grep -B 1 'Update available!'

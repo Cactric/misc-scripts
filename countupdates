@@ -1,0 +1,57 @@
+#!/usr/bin/bash
+
+if ! nm-online -qx; then
+    # Offline...
+    echo -e "\e[1;31mCan't check for updates because you're offline.\e[0m"
+    exit 1
+fi
+
+# Make a tempdir
+tmpdir="$(mktemp --tmpdir -d countupdates.XXXXXX)"
+
+# Run subcommands, writing to files
+/usr/bin/checkupdates --nocolor > "$tmpdir/checkupdates.out" &
+arch-audit -u > "$tmpdir/arch-audit.out" &
+yay -Qua > "$tmpdir/yay.out" &
+flatpak remote-ls --updates --columns=application > "$tmpdir/flatpak.out" &
+LEGENDARY_CONFIG_PATH=~/.config/heroic/legendaryConfig/legendary/ /opt/Heroic/resources/app.asar.unpacked/build/bin/x64/linux/legendary list-installed --check-updates --csv 2>/dev/null | cut -f 5 -d ',' > "$tmpdir/legendary.out" &
+
+# Wait for above subcommands
+wait
+
+count_pacman=$(wc -l < "$tmpdir/checkupdates.out")
+count_security=$(wc -l < "$tmpdir/arch-audit.out")
+count_aur=$(wc -l < "$tmpdir/yay.out")
+count_flatpak=$(wc -l < "$tmpdir/flatpak.out")
+count_heroic=$(grep -c True < "$tmpdir/legendary.out")
+
+col_reset="\e[0m"
+col_pacman=""
+col_aur=""
+col_flatpak=""
+col_heroic=""
+
+if [ "${count_pacman}" -gt 0 ]; then
+    if [ "${count_security}" -gt 0 ]; then
+        col_pacman="\e[1;31m" # red
+    else
+        col_pacman="\e[1;33m" # yellow
+    fi
+fi
+if [ "${count_aur}" -gt 0 ]; then
+    col_aur="\e[1;35m" # magenta
+fi
+if [ "${count_flatpak}" -gt 0 ]; then
+    col_flatpak="\e[1;34m" # blue
+fi
+if [ "${count_heroic}" -gt 0 ]; then
+    col_heroic="\e[1;36m" # cyan
+fi
+
+if [ $(( count_pacman + count_aur + count_flatpak + count_heroic )) -gt 0 ]; then
+    printf "${col_reset}Updates: ${col_pacman}%d (pacman)${col_reset}, ${col_aur}%d (aur)${col_reset}, ${col_flatpak}%d (flatpak)${col_reset}, ${col_heroic}%d (heroic)${col_reset}\n" "${count_pacman}" "${count_aur}" "${count_flatpak}" "${count_heroic}"
+else
+    echo "No updates"
+fi
+
+rm -rf "$tmpdir"
