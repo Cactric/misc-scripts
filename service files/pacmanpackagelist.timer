@@ -1,0 +1,10 @@
+[Unit]
+Description=Save a list of pacman installed packages weekly
+ConditionPathExists=/usr/bin/pacman
+
+[Timer]
+OnCalendar=weekly
+Persistent=true
+
+[Install]
+WantedBy=timers.target

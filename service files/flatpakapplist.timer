@@ -1,0 +1,10 @@
+[Unit]
+Description=Save a list of installed Flatpak apps weekly
+ConditionPathExists=/usr/bin/flatpak
+
+[Timer]
+OnCalendar=weekly
+Persistent=true
+
+[Install]
+WantedBy=timers.target

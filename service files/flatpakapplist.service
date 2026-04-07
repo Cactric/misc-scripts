@@ -1,0 +1,7 @@
+[Unit]
+Description=Save a list of the Flatpak apps installed on the system
+ConditionPathExists=/usr/bin/flatpak
+
+[Service]
+Type=oneshot
+ExecStart=/home/cactric/.local/bin/flatpakapplist.sh

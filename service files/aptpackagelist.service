@@ -1,0 +1,7 @@
+[Unit]
+Description=Save a list of the pacman packages installed on the system
+ConditionPathExists=/usr/bin/apt
+
+[Service]
+Type=oneshot
+ExecStart=/home/cactric/.local/bin/aptpackagelist.sh

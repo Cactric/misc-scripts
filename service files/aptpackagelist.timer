@@ -1,0 +1,10 @@
+[Unit]
+Description=Save a list of apt installed packages weekly
+ConditionPathExists=/usr/bin/apt
+
+[Timer]
+OnCalendar=weekly
+Persistent=true
+
+[Install]
+WantedBy=timers.target
