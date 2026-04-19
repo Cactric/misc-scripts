@@ -8,7 +8,7 @@ STATE="${XDG_STATE_HOME:-$HOME/.local/state}"
 
 HOST="laptop"
 DATE_STARTED="$(date '+%a %e %b %Y %H:%M:%S')"
-echo "$DATE_STARTED" > "$STATE/last-btl-started"
+echo "$DATE_STARTED" > "$STATE/last-btl-${HOST}-started"
 
 RSYNC_ARGS=()
 EXTRA_EXCLUDES=()
@@ -30,8 +30,13 @@ while [[ "$1" ]]; do
     shift
 done
 
+if ! [ -f "$CONFIG/btl-${HOST}-excludes" ]; then
+    touch "$CONFIG/btl-${HOST}-excludes"
+fi
+
 echo "Host: $HOST"
 echo "Date: $DATE_STARTED"
 rsync -av --progress --partial --delete-delay --delete-excluded --hard-links "${RSYNC_ARGS[@]}" "$SOURCE_DIR" "$HOST":"$DEST_DIR" \
 --exclude-from "$CONFIG/btl-excludes" \
-"${EXTRA_EXCLUDES[@]}" && date '+%a %e %b %Y %H:%M:%S' > "$STATE/last-btl-finished"
+--exclude-from "$CONFIG/btl-${HOST}-excludes" \
+"${EXTRA_EXCLUDES[@]}" && date '+%a %e %b %Y %H:%M:%S' > "$STATE/last-btl-${HOST}-finished"
