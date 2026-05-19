@@ -15,6 +15,12 @@ arch-audit -u > "$tmpdir/arch-audit.out" &
 yay -Qua > "$tmpdir/yay.out" &
 flatpak remote-ls --updates --columns=application > "$tmpdir/flatpak.out" &
 LEGENDARY_CONFIG_PATH=~/.config/heroic/legendaryConfig/legendary/ /opt/Heroic/resources/app.asar.unpacked/build/bin/x64/linux/legendary list-installed --check-updates --csv 2>/dev/null | cut -f 5 -d ',' > "$tmpdir/legendary.out" &
+{
+    fwupdmgr refresh 2>/dev/null; refreshed=$?
+    if [ $refreshed -eq 0 ] || [ $refreshed -eq 2 ]; then
+        fwupdmgr get-updates --json | jq '.Devices | length'
+    fi
+} > "$tmpdir/fwupd.out" &
 
 # Wait for above subcommands
 wait
@@ -24,12 +30,14 @@ count_security=$(wc -l < "$tmpdir/arch-audit.out")
 count_aur=$(wc -l < "$tmpdir/yay.out")
 count_flatpak=$(wc -l < "$tmpdir/flatpak.out")
 count_heroic=$(grep -c True < "$tmpdir/legendary.out")
+count_fwupd=$(< "$tmpdir/fwupd.out")
 
 col_reset="\e[0m"
 col_pacman=""
 col_aur=""
 col_flatpak=""
 col_heroic=""
+col_fwupd=""
 
 if [ "${count_pacman}" -gt 0 ]; then
     if [ "${count_security}" -gt 0 ]; then
@@ -47,9 +55,12 @@ fi
 if [ "${count_heroic}" -gt 0 ]; then
     col_heroic="\e[1;36m" # cyan
 fi
+if [ "${count_fwupd}" -gt 0 ]; then
+    col_fwupd="\e[1;32m" # green
+fi
 
 if [ $(( count_pacman + count_aur + count_flatpak + count_heroic )) -gt 0 ]; then
-    printf "${col_reset}Updates: ${col_pacman}%d (pacman)${col_reset}, ${col_aur}%d (aur)${col_reset}, ${col_flatpak}%d (flatpak)${col_reset}, ${col_heroic}%d (heroic)${col_reset}\n" "${count_pacman}" "${count_aur}" "${count_flatpak}" "${count_heroic}"
+    printf "${col_reset}Updates: ${col_pacman}%d (pacman)${col_reset}, ${col_aur}%d (aur)${col_reset}, ${col_flatpak}%d (flatpak), ${col_heroic}%d (heroic)${col_reset}, ${col_fwupd}%d (fwupd)${col_reset}\n" "${count_pacman}" "${count_aur}" "${count_flatpak}" "${count_heroic}" "${count_fwupd}"
 else
     echo "No updates"
 fi
