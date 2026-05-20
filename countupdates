@@ -59,7 +59,7 @@ if [ "${count_fwupd}" -gt 0 ]; then
     col_fwupd="\e[1;32m" # green
 fi
 
-if [ $(( count_pacman + count_aur + count_flatpak + count_heroic )) -gt 0 ]; then
+if [ $(( count_pacman + count_aur + count_flatpak + count_heroic + count_fwupd )) -gt 0 ]; then
     printf "${col_reset}Updates: ${col_pacman}%d (pacman)${col_reset}, ${col_aur}%d (aur)${col_reset}, ${col_flatpak}%d (flatpak)${col_reset}, ${col_heroic}%d (heroic)${col_reset}, ${col_fwupd}%d (fwupd)${col_reset}\n" "${count_pacman}" "${count_aur}" "${count_flatpak}" "${count_heroic}" "${count_fwupd}"
 else
     echo "No updates"
