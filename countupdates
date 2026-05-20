@@ -31,6 +31,8 @@ count_aur=$(wc -l < "$tmpdir/yay.out")
 count_flatpak=$(wc -l < "$tmpdir/flatpak.out")
 count_heroic=$(grep -c True < "$tmpdir/legendary.out")
 count_fwupd=$(< "$tmpdir/fwupd.out")
+# Make sure count_fwupd is not blank
+if [ -z "$count_fwupd" ]; then count_fwupd="0"; fi
 
 col_reset="\e[0m"
 col_pacman=""
