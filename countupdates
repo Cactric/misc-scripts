@@ -16,7 +16,7 @@ yay -Qua > "$tmpdir/yay.out" &
 flatpak remote-ls --updates --columns=application > "$tmpdir/flatpak.out" &
 LEGENDARY_CONFIG_PATH=~/.config/heroic/legendaryConfig/legendary/ /opt/Heroic/resources/app.asar.unpacked/build/bin/x64/linux/legendary list-installed --check-updates --csv 2>/dev/null | cut -f 5 -d ',' > "$tmpdir/legendary.out" &
 {
-    fwupdmgr refresh 2>/dev/null; refreshed=$?
+    fwupdmgr refresh >/dev/null 2>&1; refreshed=$?
     if [ $refreshed -eq 0 ] || [ $refreshed -eq 2 ]; then
         fwupdmgr get-updates --json | jq '.Devices | length'
     fi
