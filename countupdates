@@ -13,7 +13,10 @@ tmpdir="$(mktemp --tmpdir -d countupdates.XXXXXX)"
 /usr/bin/checkupdates --nocolor > "$tmpdir/checkupdates.out" &
 arch-audit -u > "$tmpdir/arch-audit.out" &
 yay -Qua > "$tmpdir/yay.out" &
+
+flatpak mask | sed 's/ //g' > "$tmpdir/flatpak_masked.out" &
 flatpak remote-ls --updates --columns=application > "$tmpdir/flatpak.out" &
+
 LEGENDARY_CONFIG_PATH=~/.config/heroic/legendaryConfig/legendary/ /opt/Heroic/resources/app.asar.unpacked/build/bin/x64/linux/legendary list-installed --check-updates --csv 2>/dev/null | cut -f 5 -d ',' > "$tmpdir/legendary.out" &
 {
     fwupdmgr refresh >/dev/null 2>&1; refreshed=$?
@@ -28,7 +31,7 @@ wait
 count_pacman=$(wc -l < "$tmpdir/checkupdates.out")
 count_security=$(wc -l < "$tmpdir/arch-audit.out")
 count_aur=$(wc -l < "$tmpdir/yay.out")
-count_flatpak=$(wc -l < "$tmpdir/flatpak.out")
+count_flatpak=$(grep -cvf "$tmpdir/flatpak_masked.out" "$tmpdir/flatpak.out")
 count_heroic=$(grep -c True < "$tmpdir/legendary.out")
 count_fwupd=$(< "$tmpdir/fwupd.out")
 # Make sure count_fwupd is not blank
