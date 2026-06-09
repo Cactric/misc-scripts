@@ -3,8 +3,8 @@
 checkupdates
 yay -Qua
 
-# Force pipe flatpak so it doesn't print the heading
-flatpak remote-ls --updates --columns=application,branch | cat
+masked="$(flatpak mask | sed 's/ //g')"
+flatpak remote-ls --updates --columns=application,branch | grep -v -e "$masked"
 
 LEGENDARY_CONFIG_PATH=~/.config/heroic/legendaryConfig/legendary/ /opt/Heroic/resources/app.asar.unpacked/build/bin/x64/linux/legendary list-installed --check-updates 2>/dev/null | grep -B 1 'Update available!'
 
