@@ -37,7 +37,7 @@ echo "$DATE_STARTED" > "$STATE/last-btl-${HOST}-started"
 echo "Host: $HOST"
 echo "Date: $DATE_STARTED"
 
-rsync -av --progress --partial --delete-delay --delete-excluded --hard-links "${RSYNC_ARGS[@]}" "$SOURCE_DIR" "$HOST":"$DEST_DIR" \
+rsync -av --human-readable --progress --partial --delete-delay --delete-excluded --hard-links "${RSYNC_ARGS[@]}" "$SOURCE_DIR" "$HOST":"$DEST_DIR" \
 --exclude-from "$CONFIG/btl-excludes" \
 --exclude-from "$CONFIG/btl-${HOST}-excludes" \
 "${EXTRA_EXCLUDES[@]}" && date '+%a %e %b %Y %H:%M:%S' > "$STATE/last-btl-${HOST}-finished"
